@@ -1,0 +1,17 @@
+services:
+
+  postgresql:
+    container_name: postgresql
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: warehouse-api-laravel-db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./create-database.sql:/docker-entrypoint-initdb.d/create-database.sql
+
+volumes:
+  pgdata: {}
