@@ -14,9 +14,45 @@ use App\Http\Requests\V1\UpdateCustomerRequest;
 
 class CustomerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    /** 
+    *  @OA\Get(
+    *      path="/api/v1/customers",
+    *      operationId="index",
+    *      tags={"Customer Controller"},
+    *      summary="Get customers",
+    *      description="Returns paginated customers",
+    *      security={{"bearerAuth": {}}},
+    *      @OA\Parameter(
+    *          name="Accept",
+    *          in="header",
+    *          required=true,
+    *          @OA\Schema(
+    *              type="string",
+    *              default="application/json"
+    *          ),
+    *          description="Content type"
+    *      ),
+    *      @OA\Parameter(
+    *          name="name[ili]",
+    *          in="header",
+    *          description="Filter customers by name",
+    *          @OA\Schema(type="string")
+    *      ),
+    *      @OA\Parameter(
+    *          name="includeInvoices",
+    *          in="header",
+    *          description="Include invoices in the response",
+    *          @OA\Schema(type="boolean")
+    *      ),
+    *      @OA\Response(
+    *          response=200,
+    *          description="Successful operation."
+    *       ),
+    *      @OA\Response(response=401, description="Unauthorized."),
+    *   ) 
+    *
+    * Returns list of projects
+    */
     public function index(Request $request)
     {
         $filter = new CustomerFilter();
