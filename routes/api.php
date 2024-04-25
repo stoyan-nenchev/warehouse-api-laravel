@@ -14,6 +14,7 @@ Route::group(['prefix'=> 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], fu
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/setup', [AuthController::class, 'setup']);
     Route::group(['middleware' => 'auth:sanctum'], function() {
         Route::apiResource('customers', CustomerController::class);
         Route::apiResource('invoices', InvoiceController::class);

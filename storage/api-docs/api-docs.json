@@ -1,41 +1,68 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "Warehouse-Swagger-Api",
+        "title": "Warehouse-API Documentation",
         "version": "1.0.0"
     },
     "paths": {
+        "/api/v1/setup": {
+            "get": {
+                "tags": [
+                    "Auth Controller"
+                ],
+                "summary": "Get auth tokens",
+                "operationId": "b9ead739838488a6e2f12239403197e1",
+                "responses": {
+                    "200": {
+                        "description": "Tokens retrieved."
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
         "/api/v1/customers": {
             "get": {
                 "tags": [
                     "Customer Controller"
                 ],
-                "summary": "Get customers",
-                "description": "Returns paginated customers",
-                "operationId": "index",
+                "summary": "Get paginated customers",
+                "description": "Returns list of projects",
+                "operationId": "4446e25a8cf802d05268d8b26e3df4af",
                 "parameters": [
                     {
-                        "name": "Accept",
-                        "in": "header",
-                        "description": "Content type",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "default": "application/json"
-                        }
-                    },
-                    {
-                        "name": "name[ili]",
-                        "in": "header",
-                        "description": "Filter customers by name",
+                        "parameter": "name",
+                        "name": "name",
+                        "in": "query",
+                        "description": "The name of the customer - case insensitive",
                         "schema": {
                             "type": "string"
                         }
                     },
                     {
+                        "parameter": "email",
+                        "name": "email",
+                        "in": "query",
+                        "description": "The customer email - exact match",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "parameter": "address",
+                        "name": "address",
+                        "in": "query",
+                        "description": "The address of the customer - case insensitive",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "parameter": "includeInvoices",
                         "name": "includeInvoices",
-                        "in": "header",
-                        "description": "Include invoices in the response",
+                        "in": "query",
+                        "description": "Include customer invoices",
                         "schema": {
                             "type": "boolean"
                         }
@@ -43,10 +70,99 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation."
+                        "description": "Customers retrieved."
                     },
                     "401": {
-                        "description": "Unauthorized."
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Customer Controller"
+                ],
+                "summary": "Create a customer",
+                "description": "Store a newly created resource in storage.",
+                "operationId": "4000324e6e48b657b38514893267ba99",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "address",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "description": "Customer full name",
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "description": "Customer address",
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "description": "Customer email",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Customer created successfully"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/customers/{id}": {
+            "get": {
+                "tags": [
+                    "Customer Controller"
+                ],
+                "summary": "Get a customer by id",
+                "description": "Display the specified resource.",
+                "operationId": "0216583091f49b195f876134d8963785",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Customer found successfully"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found."
+                    },
+                    "500": {
+                        "description": "Server Error"
                     }
                 },
                 "security": [
@@ -61,7 +177,8 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "bearerFormat": "custom",
+                "name": "Authorization",
+                "in": "header",
                 "scheme": "bearer"
             }
         }

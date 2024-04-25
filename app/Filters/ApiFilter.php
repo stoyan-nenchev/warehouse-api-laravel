@@ -8,26 +8,10 @@ use Illuminate\Http\Request;
 abstract class ApiFilter {
     protected $allowedParams = [];
     protected $columnMap = [];
-    protected $operatorMap = [
-        UserInputOperatorConstants::EQUAL => QueryOperatorConstants::EQUAL,
-        UserInputOperatorConstants::NOT_EQUAL => QueryOperatorConstants::NOT_EQUAL,
-        UserInputOperatorConstants::LIKE => QueryOperatorConstants::LIKE,
-        UserInputOperatorConstants::ILIKE => QueryOperatorConstants::ILIKE,
-        UserInputOperatorConstants::LESS_THAN => QueryOperatorConstants::LESS_THAN,
-        UserInputOperatorConstants::LESS_THAN_OR_EQUAL => QueryOperatorConstants::LESS_THAN_OR_EQUAL,
-        UserInputOperatorConstants::GREATER_THAN => QueryOperatorConstants::GREATER_THAN,
-        UserInputOperatorConstants::GREATER_THAN_OR_EQUAL => QueryOperatorConstants::GREATER_THAN_OR_EQUAL
-    ];
     protected $joins = [];
 
     protected function addJoin(string $table, string $fromColumn, string $toColumn, string $joinType) {
         $this->joins[] = compact('table', 'fromColumn', 'toColumn', 'joinType');
-    }
-
-    protected function addJoinClauses(array &$searchQuery) {
-        foreach ($this->joins as $join) {
-            $searchQuery[] = "{$join['joinType']} {$join['table']} ON {$join['fromColumn']} = {$join['toColumn']} ";
-        }
     }
 
     protected function addJoinClause(Builder &$queryBuilder) {
@@ -46,19 +30,15 @@ abstract class ApiFilter {
             if (!isset($query)) {
                 continue;
             }
-
+        
             $columnName = $this->columnMap[$param] ?? $param;
-            foreach ($operators as $operator) {
-                if (isset($query[$operator])) {
-                    $value = $query[$operator];
+            $operatorValue = $this->allowedParams[$columnName][0];
 
-                    if ($operator === UserInputOperatorConstants::ILIKE || $operator === UserInputOperatorConstants::LIKE) {
-                        $value = strtolower('%'.$value.'%');
-                    }
-
-                    $searchQuery[] = [$columnName, $this->operatorMap[$operator], $value];
-                }
+            if ($operatorValue === QueryOperatorConstants::ILIKE || $operatorValue === QueryOperatorConstants::LIKE) {
+                $query = strtolower('%'.$query.'%');
             }
+
+            $searchQuery[] = [$columnName, $operatorValue, $query];
         }
 
         $this->addJoinClause($queryBuilder);

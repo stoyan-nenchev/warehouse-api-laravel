@@ -4,15 +4,15 @@ namespace App\Filters\V1;
 
 use App\Filters\ApiFilter;
 use App\Filters\QueryJoinConstants;
-use App\Filters\UserInputOperatorConstants;
+use App\Filters\QueryOperatorConstants;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 
 class CustomerFilter extends ApiFilter {
     protected $allowedParams = [
-        'name' => [UserInputOperatorConstants::ILIKE],
-        'email' => [UserInputOperatorConstants::EQUAL],
-        'address' => [UserInputOperatorConstants::ILIKE]
+        'name' => [QueryOperatorConstants::ILIKE],
+        'email' => [QueryOperatorConstants::EQUAL],
+        'address' => [QueryOperatorConstants::ILIKE]
     ];
 
     public function search(Request $request) {

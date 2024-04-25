@@ -7,6 +7,8 @@ use App\Http\Requests\V1\LoginUserRequest;
 use App\Http\Requests\V1\RegisterUserRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Response;
+use OpenApi\Attributes as OA;
 
 class AuthController extends Controller
 {
@@ -45,5 +47,44 @@ class AuthController extends Controller
         Auth::user()->currentAccessToken()->delete();
 
         return response('User was deleted.');
+    }
+
+    #[OA\Get(
+        path: "/api/v1/setup",
+        summary: "Get auth tokens",
+        tags: ["Auth Controller"],
+        responses: [
+            new OA\Response(response: Response::HTTP_OK, description: "Tokens retrieved."),
+            new OA\Response(response: Response::HTTP_INTERNAL_SERVER_ERROR, description: "Server Error")
+        ]
+    )]
+    public function setup() {
+        $credentials = [
+            'email' => 'admin@admin.com',
+            'password' => 'password'
+        ];
+    
+        if (!Auth::attempt($credentials)) {
+            $user = new User();
+    
+            $user->name = 'Admin';
+            $user->email = $credentials['email'];
+            $user->password = bcrypt($credentials['password']);
+    
+            $user->save();
+        }
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+    
+            $adminToken = $user->createToken('admin-token', ['create','update','delete']);
+            $updateToken = $user->createToken('update-token', ['create','update']);
+            $basicToken = $user->createToken('basic-token', ['none']);
+    
+            return [
+                'admin' => $adminToken->plainTextToken,
+                'update' => $updateToken->plainTextToken,
+                'basic' => $basicToken->plainTextToken
+            ];
+        }
     }
 }
